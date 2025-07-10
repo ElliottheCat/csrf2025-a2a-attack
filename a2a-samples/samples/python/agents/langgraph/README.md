@@ -488,3 +488,36 @@ Important: The sample code provided is for demonstration purposes and illustrate
 All data received from an external agent—including but not limited to its AgentCard, messages, artifacts, and task statuses—should be handled as untrusted input. For example, a malicious agent could provide an AgentCard containing crafted data in its fields (e.g., description, name, skills.description). If this data is used without sanitization to construct prompts for a Large Language Model (LLM), it could expose your application to prompt injection attacks.  Failure to properly validate and sanitize this data before use can introduce security vulnerabilities into your application.
 
 Developers are responsible for implementing appropriate security measures, such as input validation and secure handling of credentials to protect their systems and users.
+
+
+
+# CSRF note:
+## how to run
+To run this agent, you need an API key. if not specified, the agent uses the google Gemini by default. add the following to .env
+```python
+GOOGLE_API_KEY=get_key_from_https://aistudio.google.com
+```
+
+
+Under construction (currently not functioning): 
+if you want to use other models, export the model specificaitons to your .env file. The following is an example of how you can use the free grok API:
+```python
+TOOL_LLM_NAME=llama-3.1-8b-instant
+API_KEY=get_your_API_key_on_https://console.groq.com
+TOOL_LLM_URL=https://api.groq.com/openai/v1
+model_source=groq
+```
+
+Since the models return text by default, and the agent requests JSON_schema, we will use a local server to wrap around the groq model. 
+
+to run the local server:
+```terminal
+pip install fastapi "uvicorn[standard]" httpx python-dotenv
+export GROQ_API_KEY=sk-...
+uvicorn groq_wrapper_server:app --host 0.0.0.0 --port 9000
+export model_source=openai               # tell CurrencyAgent to use ChatOpenAI
+export TOOL_LLM_URL=http://localhost:9000/v1
+export TOOL_LLM_NAME=llama-3.1-8b-instant     # any Groq-served model name
+```
+
+
